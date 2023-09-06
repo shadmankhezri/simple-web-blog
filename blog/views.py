@@ -1,8 +1,27 @@
 from django.shortcuts import render , get_object_or_404
-from .models import Article
+from .models import Article , Category , Comment
+from django.core.paginator import Paginator
 
 # Create your views here.
 
 def post_detail(request , slug):
-    article = get_object_or_404(Article , slug=slug)
+    article = get_object_or_404(Article, slug=slug)
+    if request.method == 'POST':
+        body = request.POST.get('body')
+        Comment.objects.create(body=body , article=article , user=request.user)
+
     return render(request, "blog/article_detail.html", {"article":article})
+
+
+def article_list(request):
+    articles = Article.objects.all()
+    page_number = request.GET.get('page')
+    paginator = Paginator(articles , 2)
+    objects_list = paginator.get_page(page_number)
+    return render(request , "blog/articles_list.html" , {'articles':objects_list})
+
+
+def category_detail(request , pk=None):
+    category = get_object_or_404(Category , id=pk)
+    articles = category.article_set.all()
+    return render(request , "blog/articles_list.html" , {'articles':articles})
