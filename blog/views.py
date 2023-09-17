@@ -3,7 +3,7 @@ from django.shortcuts import render , get_object_or_404 , redirect , HttpRespons
 from blog.models import Article , Category , Comment , Message
 from django.core.paginator import Paginator
 from .forms import ContactUsForm , MessageForm
-from django.views.generic.base import View , TemplateView
+from django.views.generic.base import View , TemplateView , RedirectView
 from django.views.generic import ListView
 # Create your views here.
 
@@ -52,7 +52,9 @@ def contactus(request):
 
 
 
-
+class HomePageRedirect(RedirectView):
+    # url = "/articles/list"
+    pattern_name = "blog:articles_list"
 
 class Articlelist(TemplateView):
     template_name = "blog/article_list2.html"
