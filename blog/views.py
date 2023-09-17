@@ -1,7 +1,10 @@
-from django.shortcuts import render , get_object_or_404
-from .models import Article , Category , Comment
+from django.contrib.auth.models import User
+from django.shortcuts import render , get_object_or_404 , redirect , HttpResponse
+from blog.models import Article , Category , Comment , Message
 from django.core.paginator import Paginator
-
+from .forms import ContactUsForm , MessageForm
+from django.views.generic.base import View , TemplateView
+from django.views.generic import ListView
 # Create your views here.
 
 def post_detail(request , slug):
@@ -36,3 +39,36 @@ def search(request):
     paginator = Paginator(articles , 2)
     objects_list = paginator.get_page(page_number)
     return render(request , "blog/articles_list.html" , {"articles":objects_list})
+
+
+def contactus(request):
+    if request.method == 'POST':
+        form = MessageForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+    else:
+        form = MessageForm()
+    return render(request , "blog/contact_us.html" , {'form':form})
+
+
+
+
+
+class Articlelist(TemplateView):
+    template_name = "blog/article_list2.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_list"] = Article.objects.all()
+        return context
+
+
+class UserList(ListView):
+    queryset = User.objects.all()
+    template_name = "blog/user_list.html"
+
+
+
+
+
+
